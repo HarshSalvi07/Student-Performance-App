@@ -1,15 +1,25 @@
 # ocr_handler.py
-from paddleocr import PaddleOCR
 import os
+import logging
+
+# Set environmental flags BEFORE importing PaddleOCR to disable the broken oneDNN path
+os.environ["FLAGS_use_mkldnn"] = "0"
+os.environ["FLAGS_enable_pir_api"] = "0"
+os.environ["PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT"] = "0"
+
+from paddleocr import PaddleOCR
+
+# Disable Paddle logging to keep the console clean
+logging.getLogger("ppocr").setLevel(logging.ERROR)
 
 class OCRHandler:
     def __init__(self):
-        # Initialize the PaddleOCR engine on CPU with minimal logging
+        # Initialize PaddleOCR using the updated modern parameter system
         self.ocr = PaddleOCR(
-            use_angle_cls=True, 
+            use_textline_orientation=True,  # Keep this parameter exclusively
             lang='en', 
-            show_log=False, 
-            use_gpu=False
+            device='cpu',                   # Enforces CPU execution natively
+            enable_mkldnn=False             # Bypasses the problematic oneDNN math backend
         )
         print("✅ PaddleOCR initialized successfully!")
 
@@ -17,21 +27,40 @@ class OCRHandler:
         if not os.path.exists(image_path):
             return f"File not found: {image_path}"
         try:
-            # Run OCR text detection
-            result = self.ocr.ocr(image_path, cls=True)
+            # Modern prediction call
+            result = self.ocr.predict(image_path)
             
-            # PaddleOCR returns None or empty list if no text is found
-            if not result or result[0] is None:
+            if not result:
                 return "No text detected."
-            
-            # Safely navigate PaddleOCR nested layout list and pull text fragments
+                
             text_lines = []
-            for block in result[0]:
-                if block and len(block) > 1:
-                    # block[1][0] safely targets the extracted string text fragment
-                    text_lines.append(block[1][0]) 
-                    
-            return "\n".join(text_lines)
+            
+            # Loop through individual page/document layout wrappers returned by v3.x
+            for res in result:
+                # Pattern A: Object has direct recognition attribute (Native PaddleOCR v3)
+                if hasattr(res, 'rec_texts') and res.rec_texts:
+                    if isinstance(res.rec_texts, list):
+                        text_lines.extend(res.rec_texts)
+                        
+                # Pattern B: Extracted from a dictionary layout mapping
+                elif isinstance(res, dict) and 'rec_texts' in res:
+                    if isinstance(res['rec_texts'], list):
+                        text_lines.extend(res['rec_texts'])
+                        
+                # Pattern C: Fallback extraction check targeting layout-block subparts
+                elif hasattr(res, 'doc_res') and isinstance(res.doc_res, list):
+                    for sub_item in res.doc_res:
+                        if isinstance(sub_item, dict) and 'text' in sub_item:
+                            text_lines.append(sub_item['text'])
+                            
+                # Pattern D: General sub-block extraction loop
+                elif hasattr(res, 'res') and isinstance(res.res, dict) and 'texts' in res.res:
+                    text_lines.extend(res.res['texts'])
+
+            # Clean whitespace and drop any stray structural fragments
+            text_lines = [str(line).strip() for line in text_lines if line and str(line).strip()]
+
+            return "\n".join(text_lines) if text_lines else "No structured text found inside the object."
             
         except Exception as e:
             return f"Error: {str(e)}"

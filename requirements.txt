@@ -1,3 +1,4 @@
+# --- Your Existing Stack ---
 langchain>=0.3.0
 langchain-openai
 langchain-groq
@@ -9,3 +10,15 @@ python-dotenv
 duckduckgo-search
 pypdf
 dotenv
+
+# --- Safe Multimodal OCR Bridge Extensions ---
+opencv-python-headless
+pyclipper
+shapely
+imgaug
+lmdb
+rapidfuzz
+
+# Modernized Paddle Engine Layout
+paddlepaddle>=2.6.1
+paddleocr>=3.0.0
