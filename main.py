@@ -14,7 +14,8 @@ from ocr_handler import OCRHandler
 from prompts import ANALYSIS_PROMPT
 
 def run_automated_pipeline(image_path):
-    print("🚀 Step 1: Running your stable PaddleOCR Engine...")
+    print("NOTE: This process may take upto 30 seconds, please be patient")
+    print("🚀 Step 1: Running a stable PaddleOCR Engine...")
     ocr_worker = OCRHandler()
     extracted_text = ocr_worker.extract_text(image_path)
     
@@ -49,7 +50,7 @@ def run_automated_pipeline(image_path):
             top_p=1.0,
             stream=False,
         )
-        
+        print("Thank you for waiting, we appreciate your patience")
         print("\n=== ✨ CONSISTENT ADVISOR REMEDIATION OUTPUT ===")
         print(response.choices[0].message.content)
         return response.choices[0].message.content
