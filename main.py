@@ -34,7 +34,7 @@ def run_automated_pipeline(image_path):
         client = Groq()
         
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
             messages=[
                 {
                     "role": "system",
@@ -45,7 +45,7 @@ def run_automated_pipeline(image_path):
                     "content": final_prompt
                 }
             ],
-            temperature=1.5,
+            temperature=2.0,
             max_tokens=2048,
             top_p=1.0,
             stream=False,
