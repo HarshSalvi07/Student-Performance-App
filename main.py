@@ -29,7 +29,7 @@ def run_automated_pipeline(image_path):
     # Injecting ONLY the raw OCR text string into the prompt template
     final_prompt = ANALYSIS_PROMPT.format(data=extracted_text)
     
-    print("🧠 Step 3: Routing text payload directly to Llama-3.3-70b-Versatile...")
+    print("🧠 Step 3: Routing text payload directly to openai/gpt-oss-120b...")
     try:
         client = Groq()
         
@@ -45,7 +45,7 @@ def run_automated_pipeline(image_path):
                     "content": final_prompt
                 }
             ],
-            temperature=0.0,
+            temperature=1.5,
             max_tokens=2048,
             top_p=1.0,
             stream=False,
