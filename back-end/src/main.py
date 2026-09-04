@@ -21,7 +21,7 @@ def run_automated_pipeline(image_path):
     
     if "Error:" in extracted_text or extracted_text == "No text detected.":
         print(f"❌ Automation Halted: {extracted_text}")
-        return
+        return f"Could not analyze image: {extracted_text}" 
         
     print("✅ Text layout map pulled from image structure!")
     
@@ -57,6 +57,7 @@ def run_automated_pipeline(image_path):
         
     except Exception as e:
         print(f"❌ LLM Automation Error: {str(e)}")
+        return f"LLM Automation Error: {str(e)}"
 
 if __name__ == "__main__":
     # The image path is the only item passed to the pipeline execution entry point

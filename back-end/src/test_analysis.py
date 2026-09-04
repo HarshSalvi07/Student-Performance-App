@@ -21,4 +21,4 @@ with open("data/sample_student_data.csv", "r") as f:
 response = chain.invoke({"data": data})
 
 print("=== Analysis Result ===")
-print(response.content)
+print(response.content) 
