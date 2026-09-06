@@ -1,8 +1,8 @@
 from utils import create_token, hass_password
 from database import get_db
 from models import User,AnalysisData
-from fastapi import FastAPI, Depends, HTTPException, status,UploadFile,File,Form
-from schema import RegisterSchema
+from fastapi import FastAPI, Depends, HTTPException, status,UploadFile,File
+from schema import RegisterSchema,ProfileSchema, ProfileUpdateSchema
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import datetime
@@ -17,15 +17,26 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 @app.post('/register')
-def register(user: RegisterSchema,db: Session = Depends(get_db) ):
+def register(user: RegisterSchema, image: UploadFile = File(...),db: Session = Depends(get_db) ):
+
+    # CODE
     userExist = db.query(User).filter(User.email == user.email).first()
     if userExist :
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,detail="User Already Exist")
 
-    hass_Pass = hass_password.hashpassword(user.password)
+    if user.create_password != user.confirm_password:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="password not match")
+
+    file_path = os.path.join(UPLOAD_DIR, image.filename)
+
+    hass_Pass = hass_password.hashpassword(user.confirm_password)
 
     new_user = User(
+        image = file_path,
         username = user.username,
+        age = user.age,
+        studentClass = user.studentClass,
+        description = user.description,
         email = user.email,
         password = hass_Pass
     )
@@ -37,8 +48,11 @@ def register(user: RegisterSchema,db: Session = Depends(get_db) ):
     return {"Message": "Signup Successfull"}
 
 
+
 @app.post('/login')
 def login(form_data: OAuth2PasswordRequestForm = Depends(),db: Session = Depends(get_db)):
+
+    # CODE
     userExit = db.query(User).filter(User.username == form_data.username).first()
 
     if not userExit:
@@ -56,11 +70,11 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(),db: Session = Depends
 
 @app.post('/dashboard')
 async def dashboard(
-    user_text: str = Form(...),
     image: UploadFile = File(...),
     current_user: dict = Depends(create_token.get_current_user),
     db: Session = Depends(get_db)):
 
+    # CODE
     if not image.content_type.startswith("image/"):
         return {"error": "Only Image files are Allowed"}
 
@@ -73,7 +87,6 @@ async def dashboard(
     feedback = run_automated_pipeline(file_path)
 
     new_data = AnalysisData(
-        text = user_text,
         upload = file_path,
         analysis = feedback,
         createdAt = " ".join(date),
@@ -85,19 +98,58 @@ async def dashboard(
     db.refresh(new_data)
 
     return {
-        "ocr_text": user_text,
         "Feedback": feedback
     }
+
 
 
 @app.get("/history")
 def chatHistory(current_user: dict = Depends(create_token.get_current_user),
     db: Session = Depends(get_db)):
 
+    # CODE
     user_id = int(current_user['user_id'])
-    user_history = db.query(AnalysisData).filter(User.id == user_id).all()
+    user_history = db.query(AnalysisData).filter(AnalysisData.userId == user_id).all()
     return user_history
 
 
-# Need to improve user data model 
-# create a profile page
+
+@app.get('/profile')
+def profile(current_user: dict = Depends(create_token.get_current_user),
+            db: Session = Depends(get_db)):
+
+            # CODE
+            user_id = int(current_user['user_id'])
+            user_profile = db.query(User).filter(User.id == user_id).first()
+
+            data = ProfileSchema(
+                 image=user_profile.image,
+                 username=user_profile.username,
+                 age=user_profile.age,
+                 studentClass=user_profile.studentClass,
+                 description=user_profile.description,
+                 email=user_profile.email
+            )
+            return data
+
+
+@app.put('/profile_update')
+def profile(user: ProfileUpdateSchema,current_user: dict = Depends(create_token.get_current_user),
+            db: Session = Depends(get_db)):
+
+            # CODE
+            user_id = int(current_user['user_id'])
+            user_profile = db.query(User).filter(User.id == user_id).first()
+
+            if not user_profile:
+                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User Not found")
+
+            new_data = user.model_dump(exclude_unset=True)
+
+            for key, value in new_data.item():
+                 setattr(user_profile,key,value)
+
+            db.commit()
+            db.refresh(user_profile)
+            
+            return 
