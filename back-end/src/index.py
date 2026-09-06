@@ -1,25 +1,37 @@
 from utils import create_token, hass_password
 from database import get_db
 from models import User,AnalysisData
-from fastapi import FastAPI, Depends, HTTPException, status,UploadFile,File
+from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Form
 from schema import RegisterSchema,ProfileSchema, ProfileUpdateSchema
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import datetime
 from main import run_automated_pipeline
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import shutil
+import json
  
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 @app.post('/register')
-def register(user: RegisterSchema, image: UploadFile = File(...),db: Session = Depends(get_db) ):
+def register(user: str = Form(...), image: UploadFile = File(...),db: Session = Depends(get_db) ):
 
     # CODE
+    user = RegisterSchema.model_validate(json.loads(user))
+
     userExist = db.query(User).filter(User.email == user.email).first()
     if userExist :
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,detail="User Already Exist")
@@ -28,6 +40,10 @@ def register(user: RegisterSchema, image: UploadFile = File(...),db: Session = D
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="password not match")
 
     file_path = os.path.join(UPLOAD_DIR, image.filename)
+    contents = image.file.read()
+
+    with open(file_path, "wb") as f:
+        f.write(contents)
 
     hass_Pass = hass_password.hashpassword(user.confirm_password)
 
@@ -40,6 +56,7 @@ def register(user: RegisterSchema, image: UploadFile = File(...),db: Session = D
         email = user.email,
         password = hass_Pass
     )
+    
 
     db.add(new_user)
     db.commit()
@@ -132,7 +149,7 @@ def profile(current_user: dict = Depends(create_token.get_current_user),
             )
             return data
 
-
+ 
 @app.put('/profile_update')
 def profile(user: ProfileUpdateSchema,current_user: dict = Depends(create_token.get_current_user),
             db: Session = Depends(get_db)):
