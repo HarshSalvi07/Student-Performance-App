@@ -1,54 +1,13 @@
-// import axios from "axios"
-// import { useState } from "react"
-// import { Link } from "react-router-dom"
-
-// function Login() {
-//     const [username, setUsername] = useState('')
-//     const [password, setPassword] = useState('')
-
-//     const LoginButton = async () => {
-//         const from_data = new URLSearchParams()
-
-//         from_data.append("username", username)
-//         from_data.append("password", password)
-//         const res = await axios.post("http://127.0.0.1:8000/login",
-//             from_data,
-//             {
-//                 headers: {
-//                     "Content-Type": "application/x-www-form-urlencoded",
-//                 },
-//             }
-//         )
-//         console.log("Login Successfull")
-//     }
-
-//     return (
-//         <div>
-//             <form >
-//                 {/* USERNAME */}
-//                 <label htmlFor="Username">Username</label>
-//                 <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-//                 {/* PASSWORD */}
-//                 <label htmlFor="Password">Password</label>
-//                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-//                 <button type="button" onClick={LoginButton}>Submit</button>
-//                 <h3><Link to={"/register"}>Register</Link></h3>
-//             </form>
-//         </div>
-//     )
-// }
-
-// export default Login
-
-
 import axios from "axios"
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import logowithtext from "../assets/logowithtext.png"
 
 function Login() {
 
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    const navigate = useNavigate()
 
     const LoginButton = async () => {
         try {
@@ -67,122 +26,96 @@ function Login() {
                 }
             )
 
+            localStorage.setItem("access_token", res.data.access_token)
             console.log("Login Successful")
-            console.log(res.data)
 
         } catch (error: any) {
             console.log("STATUS:", error.response?.status)
             console.log("DETAIL:", error.response?.data?.detail)
         }
+
+        navigate("/dashboard")
     }
 
     return (
-        <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center px-4">
+        <div className="min-h-screen relative overflow-hidden bg-linear-to-br from-slate-50 via-white to-indigo-50 flex items-center justify-center px-4">
 
-            {/* MAIN CONTAINER */}
-            <div className="w-full max-w-md bg-white rounded-xl border border-gray-400 shadow-2xl p-6 sm:p-8">
+            {/* Background Blur */}
+            <div className="absolute -top-20 -left-16 h-72 w-72 rounded-full bg-indigo-200/30 blur-3xl" />
+            <div className="absolute -bottom-20 -right-10 h-80 w-80 rounded-full bg-violet-200/30 blur-3xl" />
 
-                {/* HEADER */}
+            {/* Login Card */}
+            <div className="relative w-full max-w-md rounded-[28px] border border-white/70 bg-white/80 backdrop-blur-xl shadow-[0_20px_60px_rgba(79,70,229,0.12)] p-8">
+
+                {/* Header */}
                 <div className="text-center mb-8">
+                    <img src={logowithtext} alt="" className="mx-auto flex justify-center h-45 w-45" />
 
-                    <h1 className="text-2xl font-semibold text-gray-800">
+                    <h1 className="text-3xl font-bold tracking-tight text-slate-900">
                         Welcome Back
                     </h1>
 
-                    <p className="mt-2 text-sm text-gray-500">
-                        Login to analyze and improve your academic performance.
+                    <p className="mt-2 text-sm leading-6 text-slate-500">
+                        Continue your AI-powered learning journey.
                     </p>
 
                 </div>
 
                 <form className="space-y-5">
 
-                    {/* USERNAME */}
+                    {/* Username */}
                     <div>
 
-                        <label
-                            htmlFor="Username"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                             Username
                         </label>
 
                         <input
-                            id="Username"
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             placeholder="Enter your username"
-                            className="w-full px-3 py-2.5
-                            border border-gray-300
-                            rounded-md
-                            text-sm text-gray-800
-                            focus:outline-none
-                            focus:ring-2
-                            focus:ring-blue-500
-                            focus:border-blue-500"
+                            className="w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-sm text-slate-700 placeholder:text-slate-400 shadow-sm transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-100"
                         />
 
                     </div>
 
-                    {/* PASSWORD */}
+                    {/* Password */}
                     <div>
 
-                        <label
-                            htmlFor="Password"
-                            className="block text-sm font-medium text-gray-700 mb-1"
-                        >
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                             Password
                         </label>
 
                         <input
-                            id="Password"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter your password"
-                            className="w-full px-3 py-2.5
-                            border border-gray-300
-                            rounded-md
-                            text-sm text-gray-800
-                            focus:outline-none
-                            focus:ring-2
-                            focus:ring-blue-500
-                            focus:border-blue-500"
+                            className="w-full rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-sm text-slate-700 placeholder:text-slate-400 shadow-sm transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-100"
                         />
 
                     </div>
 
-                    {/* LOGIN BUTTON */}
+                    {/* Login Button */}
                     <button
                         type="button"
                         onClick={LoginButton}
-                        className="w-full
-                        bg-blue-600
-                        text-white
-                        py-2.5
-                        rounded-md
-                        text-sm
-                        font-medium
-                        hover:bg-blue-700
-                        focus:outline-none
-                        focus:ring-2
-                        focus:ring-blue-500
-                        transition"
+                        className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 py-3.5 text-sm font-semibold tracking-wide text-white shadow-[0_12px_30px_rgba(79,70,229,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(79,70,229,0.45)] active:translate-y-0"
                     >
                         Login
                     </button>
 
-                    {/* REGISTER */}
-                    <div className="text-center text-sm text-gray-600 pt-1">
+                    {/* Register */}
+                    <div className="pt-1 text-center text-sm text-slate-500">
 
                         Don't have an account?{" "}
 
                         <Link
                             to="/register"
-                            className="text-blue-600 font-medium hover:text-blue-700"
+                            className="font-semibold text-indigo-600 transition hover:text-indigo-700"
                         >
-                            Register
+                            Create Account
                         </Link>
 
                     </div>
