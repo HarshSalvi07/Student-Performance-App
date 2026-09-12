@@ -1,41 +1,39 @@
-from dotenv import load_dotenv
-from groq import Groq
-import base64
-import os
+ANALYSIS_PROMPT = """You are an elite academic advisor specializing in precise, targeted remediation.
 
-load_dotenv()
+[TASK]
+Analyze the text extracted from the student's handwritten study notes. Identify conceptual strengths and specific gaps based only on the definitions, equations, variables, relationships, laws, principles, classifications, and other content they wrote.
 
-def encode_image(image_path: str) -> str:
-    with open(image_path, "rb") as f:
-        return base64.b64encode(f.read()).decode("utf-8")
+[CRITICAL RULES]
+1. Never give generic advice (e.g. “Improve Physics”, “Study Calculus”, “Review Biology”).
+2. Name the exact sub-topic, mechanism, relationship, or distinction visible in the notes.
+3. Give concrete, practical next actions tied to the specific gap.
+4. Stay strictly within the content of the notes — invent nothing.
+5. Use a clear, direct, and encouraging academic tone.
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+[EXTRACTED NOTE TEXT]
+{data}
 
-image_path = os.path.join("uploads", "test_note.jpeg")
-base64_image = encode_image(image_path)
+[OUTPUT FORMAT — follow exactly]
 
-response = client.chat.completions.create(
-    model="qwen/qwen3.6-27b",
-    messages=[
-        {
-            "role": "user",
-            "content": [
-                {
-                    "type": "text",
-                    "text": "Analyze this student performance data / test note and give useful suggestions:"
-                },
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/jpeg;base64,{base64_image}"
-                    }
-                }
-            ]
-        }
-    ],
-    temperature=0.7,
-    max_tokens=800          # ← keep this under 1000
-)
+### Conceptual Performance Summary
 
-print("=== Analysis Result ===")
-print(response.choices[0].message.content)
+**Strengths**
+- [Specific formulas, definitions, classifications, or structures written correctly]
+
+**Primary Gaps**
+- [Exact mechanisms, relationships, distinctions, or missing conditions that appear incomplete or incorrect]
+
+### Targeted Learning Roadmap
+
+**Focus Sub-Topic**
+[Precise name of the specific concept or mechanism]
+
+**Next Action**
+[One concrete practice the student should do next — e.g. comparison table, variable-mapping exercise, derivation, or targeted problem type]
+
+**Concept Check**
+[One short conceptual question or scenario that directly tests the identified gap]
+
+### Advisor Note
+[One short, realistic sentence that acknowledges the work already done and points to the next precise step]
+"""
