@@ -1,16 +1,17 @@
-from utils import create_token, hass_password
-from database import get_db
-from models import User,AnalysisData
 from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Form
 from schema import RegisterSchema,ProfileSchema, ProfileUpdateSchema
-from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
-from datetime import datetime
-from main import run_automated_pipeline
 from fastapi.middleware.cors import CORSMiddleware
-import os
+from utils import create_token, hass_password
+from fastapi.staticfiles import StaticFiles
+from main import run_automated_pipeline
+from models import User,AnalysisData
+from sqlalchemy.orm import Session
+from datetime import datetime
+from database import get_db
 import shutil
 import json
+import os
  
 app = FastAPI()
 
@@ -24,6 +25,7 @@ app.add_middleware(
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 
 @app.post('/register')
@@ -127,7 +129,27 @@ def chatHistory(current_user: dict = Depends(create_token.get_current_user),
     # CODE
     user_id = int(current_user['user_id'])
     user_history = db.query(AnalysisData).filter(AnalysisData.userId == user_id).all()
+    if not user_history:
+         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    
     return user_history
+
+
+
+@app.delete("/delete_history/{id}")
+def delete_history(id: int, current_user: dict = Depends(create_token.get_current_user),
+    db: Session = Depends(get_db)):
+     
+     user_id = int(current_user['user_id'])
+     user_data = db.query(AnalysisData).filter(AnalysisData.userId == user_id, AnalysisData.id == id).first()
+
+     if not user_data:
+          raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
+
+     db.delete(user_data)
+     db.commit()
+
+     return {"Message": "Deleted Successfully"}
 
 
 
@@ -139,6 +161,9 @@ def profile(current_user: dict = Depends(create_token.get_current_user),
             user_id = int(current_user['user_id'])
             user_profile = db.query(User).filter(User.id == user_id).first()
 
+            if not user_profile:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
             data = ProfileSchema(
                  image=user_profile.image,
                  username=user_profile.username,
@@ -149,12 +174,16 @@ def profile(current_user: dict = Depends(create_token.get_current_user),
             )
             return data
 
+
+
  
 @app.put('/profile_update')
-def profile(user: ProfileUpdateSchema,current_user: dict = Depends(create_token.get_current_user),
+def profile(user: str = Form(...),current_user: dict = Depends(create_token.get_current_user),
             db: Session = Depends(get_db)):
 
             # CODE
+            user = ProfileUpdateSchema.model_validate(json.loads(user))
+        
             user_id = int(current_user['user_id'])
             user_profile = db.query(User).filter(User.id == user_id).first()
 
@@ -163,10 +192,10 @@ def profile(user: ProfileUpdateSchema,current_user: dict = Depends(create_token.
 
             new_data = user.model_dump(exclude_unset=True)
 
-            for key, value in new_data.item():
+            for key, value in new_data.items():
                  setattr(user_profile,key,value)
 
             db.commit()
             db.refresh(user_profile)
             
-            return 
+            return {"Updated successfully"}

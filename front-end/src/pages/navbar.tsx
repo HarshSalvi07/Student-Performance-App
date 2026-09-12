@@ -44,18 +44,20 @@ function Navbar() {
                 <ul className="flex items-center gap-8 text-slate-700 font-semibold ">
 
                     {!isLoggedIn && (
-                        <li>
-                            <Link to="/" className="hover:text-indigo-600 transition hover:bg-indigo-100 p-1 px-2 rounded-xl">
-                                Home
-                            </Link>
-                        </li>
+                        <div className="flex items-center gap-8 text-slate-700 font-semibold ">
+                            <li>
+                                <Link to="/" className="hover:text-indigo-600 transition hover:bg-indigo-100 p-1 px-2 rounded-xl">
+                                    Home
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/about" className="hover:text-indigo-600 transition hover:bg-indigo-100 p-1 px-2 rounded-xl">
+                                    About
+                                </Link>
+                            </li>
+                        </div>
                     )}
 
-                    <li>
-                        <Link to="/about" className="hover:text-indigo-600 transition hover:bg-indigo-100 p-1 px-2 rounded-xl">
-                            About
-                        </Link>
-                    </li>
 
                     {isLoggedIn ? (
                         <>
@@ -70,7 +72,11 @@ function Navbar() {
                                     History
                                 </Link>
                             </li>
-
+                            <li>
+                                <Link to="/about" className="hover:text-indigo-600 transition hover:bg-indigo-100 p-1 px-2 rounded-xl">
+                                    About
+                                </Link>
+                            </li>
                             <li>
                                 <Link to="/profile" className="hover:text-indigo-600 transition hover:bg-indigo-100 p-1 px-2 rounded-xl">
                                     Profile
