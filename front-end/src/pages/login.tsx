@@ -1,3 +1,4 @@
+import { toast } from "sonner"
 import axios from "axios"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
@@ -27,14 +28,17 @@ function Login() {
             )
 
             localStorage.setItem("access_token", res.data.access_token)
-            console.log("Login Successful")
-
+            toast.success("Login Successfully")
+            navigate("/dashboard")
         } catch (error: any) {
-            console.log("STATUS:", error.response?.status)
-            console.log("DETAIL:", error.response?.data?.detail)
+            if (error.response?.status === 404) {
+                toast.error("User not found")
+            } else if (error.response?.status === 401) {
+                toast.error("Incorrect username or password")
+            } else {
+                toast.error("Unable to login. Please try again.")
+            }
         }
-
-        navigate("/dashboard")
     }
 
     return (

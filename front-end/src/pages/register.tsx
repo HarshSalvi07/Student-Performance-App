@@ -3,6 +3,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import logowithtext from "../assets/logowithtext.png"
+import { toast } from "sonner"
 
 function Register() {
 
@@ -36,19 +37,22 @@ function Register() {
                 form_data.append("image", image)
             }
 
-            const res = await axios.post(
+            await axios.post(
                 "http://127.0.0.1:8000/register",
                 form_data
             )
 
-            console.log(res.data)
+            toast.success(`Register new user: ${username} Successfully`)
+            navigate("/login")
         }
         catch (error: any) {
-            console.log("STATUS:", error.response?.status)
-            console.log("DETAIL:", error.response?.data?.detail)
-        }
-        finally{
-            navigate("/login")
+            if (error.response?.status === 409) {
+                toast.error("Password not match")
+            } else if (error.response?.status === 302) {
+                toast.error("User Already exist")
+            } else {
+                toast.error("Unable to Register. Please try again.")
+            }
         }
     }
 
@@ -65,7 +69,7 @@ function Register() {
                 <div className="text-center mb-8">
 
                     <div className="mx-auto mb-4 flex h-54 w-md items-center justify-center rounded-2xl bg-linear-to-br bg-indigo-50 shadow-indigo-900 shadow-xl/40 ">
-                        <img src={logowithtext} alt=""  />
+                        <img src={logowithtext} alt="" />
                     </div>
                 </div>
 

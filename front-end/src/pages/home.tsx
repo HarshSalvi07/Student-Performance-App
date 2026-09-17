@@ -10,9 +10,24 @@ function Home() {
 
                     {/* Left */}
                     <div>
-                        <p className="inline-block rounded-full bg-indigo-100 px-4 py-1 text-sm font-semibold text-indigo-700">
-                            AI Powered Learning Platform
-                        </p>
+                        <div className="flex items-center gap-2 max-w-fit rounded-full bg-indigo-100 px-4 py-2 text-sm font-semibold text-indigo-800">
+                            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
+
+                            <div className="relative overflow-hidden">
+                                <span className="relative z-10">AI Powered Learning Platform</span>
+
+                                {/* Shimmer */}
+                                <div className="absolute inset-0 -translate-x-full animate-[shimmer_1.8s_linear_infinite] bg-linear-to-r from-transparent via-white to-transparent" />
+                            </div>
+
+                            <style>{`
+      @keyframes shimmer {
+        100% {
+          transform: translateX(200%);
+        }
+      }
+    `}</style>
+                        </div>
 
                         <h1 className="mt-6 text-5xl font-bold leading-tight text-slate-900">
                             Student Performance Analysis System
@@ -125,6 +140,95 @@ function Home() {
                 </div>
             </section>
 
+            {/* ================= AI REPORT PREVIEW ================= */}
+            <section className="min-h-screen flex items-center">
+                <div className="max-w-7xl mx-auto w-full px-6 py-20">
+                    <div className="grid lg:grid-cols-2 gap-12 items-center">
+
+                        <div>
+                            <p className="text-2xl font-semibold uppercase  text-indigo-600">
+                                SAMPLE REPORT
+                            </p>
+                            <h2 className="mt-1 text-3xl sm:text-4xl font-bold text-slate-900">
+                                AI Doesn't Just Give Marks.
+                            </h2>
+
+                            <p className="mt-6 text-lg leading-8 text-slate-600">
+                                It explains your mistakes, identifies concept gaps, highlights strengths, and recommends exactly what to practice next.
+                            </p>
+
+                            <div className="mt-8 space-y-4">
+                                {[
+                                    "Concept-wise performance evaluation",
+                                    "Strengths & weaknesses identification",
+                                    "Personalized improvement suggestions",
+                                    "Permanent history of every analysis",
+                                ].map((item) => (
+                                    <div key={item} className="flex items-center gap-3">
+                                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                                            ✓
+                                        </div>
+                                        <span className="text-slate-700 text-xl">{item}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="rounded-3xl bg-white p-6 shadow-2xl border border-slate-100">
+                            <div className="flex items-center justify-between border-b pb-4">
+                                <div>
+                                    <p className="text-xs font-semibold text-indigo-600">
+                                        AI REPORT
+                                    </p>
+                                    <h3 className="font-bold text-slate-900">
+                                        Physics Test Analysis
+                                    </h3>
+                                </div>
+
+                                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                                    Completed
+                                </span>
+                            </div>
+
+                            <div className="mt-6 space-y-4">
+
+                                <div className="rounded-xl bg-emerald-50 p-4">
+                                    <h4 className="font-semibold text-emerald-700">
+                                        Strengths
+                                    </h4>
+
+                                    <p className="mt-1 text-sm text-slate-600">
+                                        Excellent conceptual understanding of thermodynamics.
+                                    </p>
+                                </div>
+
+                                <div className="rounded-xl bg-amber-50 p-4">
+                                    <h4 className="font-semibold text-amber-700">
+                                        Needs Improvement
+                                    </h4>
+
+                                    <p className="mt-1 text-sm text-slate-600">
+                                        Numerical calculations and formula application require practice.
+                                    </p>
+                                </div>
+
+                                <div className="rounded-xl bg-indigo-50 p-4">
+                                    <h4 className="font-semibold text-indigo-700">
+                                        AI Suggestion
+                                    </h4>
+
+                                    <p className="mt-1 text-sm text-slate-600">
+                                        Practice 5 numerical questions daily and revise energy balance concepts.
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
             {/* Features */}
             <section className="max-w-7xl mx-auto px-6 py-16">
                 <div className="text-center mb-12">
@@ -175,6 +279,35 @@ function Home() {
                         </p>
                     </div>
 
+                </div>
+                <div className="mt-16 grid sm:grid-cols-3 gap-6 text-center">
+
+                    <div className="rounded-2xl bg-white p-6">
+                        <h3 className="text-3xl font-bold text-indigo-600">
+                            AI
+                        </h3>
+                        <p className="mt-2 text-slate-500">
+                            Intelligent Evaluation
+                        </p>
+                    </div>
+
+                    <div className="rounded-2xl bg-white p-6">
+                        <h3 className="text-3xl font-bold text-violet-600">
+                            OCR
+                        </h3>
+                        <p className="mt-2 text-slate-500">
+                            Text Recognition
+                        </p>
+                    </div>
+
+                    <div className="rounded-2xl bg-white p-6">
+                        <h3 className="text-3xl font-bold text-emerald-600">
+                            24/7
+                        </h3>
+                        <p className="mt-2 text-slate-500">
+                            Learning Assistance
+                        </p>
+                    </div>
                 </div>
             </section>
 

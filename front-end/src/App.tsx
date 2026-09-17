@@ -7,13 +7,15 @@ import Navbar from './pages/navbar';
 import Profile from './pages/profile';
 import History from './pages/history';
 import About from './pages/about';
+import ProtectedRoute from './lib/protected_routes';
+import { Toaster } from 'sonner';
 
 function App() {
   const location = useLocation()
 
-  const hideNavbar = 
-  location.pathname === "/login" ||
-  location.pathname === "/register"
+  const hideNavbar =
+    location.pathname === "/login" ||
+    location.pathname === "/register"
 
   return (
     <div className='min-h-screen bg-[#F6F8FC]'>
@@ -22,11 +24,17 @@ function App() {
         <Route path='/' element={<Home />} />
         <Route path='/register' element={<Register />} />
         <Route path='/login' element={<Login />} />
-        <Route path='/dashboard' element={<Dashboard />} />
-        <Route path='/profile' element={<Profile />} />
-        <Route path='/history' element={<History />} />
+        <Route path='/dashboard' element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path='/profile' element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path='/history' element={<ProtectedRoute><History /></ProtectedRoute>} />
         <Route path='/about' element={<About />} />
       </Routes>
+
+      <Toaster
+        position="bottom-right"
+        richColors
+        closeButton
+      />
     </div>
   );
 }

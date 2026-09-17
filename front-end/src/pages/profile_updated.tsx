@@ -1,5 +1,8 @@
 import axios from "axios"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { autoLogout } from "../lib/utils"
+import { toast } from "sonner"
 
 type ProfileUpdateProps = {
     currentImage: string
@@ -8,6 +11,7 @@ type ProfileUpdateProps = {
     studentClass: string
     description: string
     onClose: () => void
+    onSuccess: (data: any) => void
 }
 
 function ProfileUpdate({
@@ -16,7 +20,8 @@ function ProfileUpdate({
     age: initialAge,
     studentClass: initialStudentClass,
     description: initialDescription,
-    onClose
+    onClose,
+    onSuccess
 }: ProfileUpdateProps) {
 
     const [image, setImage] = useState<File | null>(null)
@@ -25,6 +30,7 @@ function ProfileUpdate({
     const [age, setAge] = useState(initialAge)
     const [studentClass, setStudentClass] = useState(initialStudentClass)
     const [description, setDescription] = useState(initialDescription)
+    const navigate = useNavigate()
 
     const update = async () => {
         try {
@@ -58,15 +64,19 @@ function ProfileUpdate({
                 }
             )
 
-            console.log(res.data)
+            toast.success("Profile Updated Successfully")
 
-            // Close only after successful update
+            onSuccess(res.data)
             onClose()
 
         } catch (error: any) {
-
-            console.log("STATUS:", error.response?.status)
-            console.log("DETAIL:", error.response?.data?.detail)
+            if (error.response?.status === 401) autoLogout(navigate)
+            else if (error.response?.status === 404) {
+                toast.error("User not found")
+            } else {
+                toast.error("Unable to login. Please try again.")
+            }
+            
 
         }
     }
@@ -88,12 +98,15 @@ function ProfileUpdate({
 
             <div className="space-y-4">
 
-                {/* Current Image */}
-                {currentImage && (
+                {(image || currentImage) && (
                     <div className="flex justify-center">
                         <img
-                            src={`http://127.0.0.1:8000/${currentImage}`}
-                            alt="Current Profile"
+                            src={
+                                image
+                                    ? URL.createObjectURL(image)
+                                    : `http://127.0.0.1:8000/${currentImage}`
+                            }
+                            alt="Profile Preview"
                             className="h-24 w-24 rounded-full object-cover border-4 border-indigo-100"
                         />
                     </div>

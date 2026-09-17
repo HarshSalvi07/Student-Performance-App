@@ -1,45 +1,76 @@
+import { toast } from "sonner"
 import axios from "axios"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "../components/ui/alert-dialog"
+import { Button } from "../components/ui/button"
+import { useNavigate } from "react-router-dom"
+import { autoLogout } from "../lib/utils"
 
 type Props = {
     id: number
+    onDelete: () => void
 }
 
-function DeleteHistory({ id }: Props) {
-
+function DeleteHistory({ id, onDelete }: Props) {
+    const navigate = useNavigate()
     const deleteRecord = async () => {
-
-        const confirmDelete = window.confirm(
-            "Are you sure you want to permanently delete this analysis?"
-        )
-
-        if (!confirmDelete) return
 
         try {
             const token = localStorage.getItem("access_token")
 
             await axios.delete(
-                `http://127.0.0.1:8000/history/${id}`,
+                `http://127.0.0.1:8000/delete_history/${id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 }
             )
+            onDelete()
+            toast.success("Data Deleted Successfully")
 
-            window.location.reload()
-
-        } catch (error) {
-            console.log(error)
+        } catch (error: any) {
+            if (error.message?.status === 401) autoLogout(navigate)
+            else if (error.response?.status === 404) {
+                toast.error("User not found")
+            } else {
+                toast.error("Unable to login. Please try again.")
+            }
         }
     }
 
     return (
-        <button
-            onClick={deleteRecord}
-            className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-        >
-            Delete
-        </button>
+        <AlertDialog>
+            <AlertDialogTrigger render={<Button variant="destructive">Delete</Button>} />
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Deleting Generated Notes</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete your
+                        Generated data
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel variant="secondary" size="default" >Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={deleteRecord}>Delete</AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+        // <button
+        //     onClick={deleteRecord}
+        //     className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+        // >
+        //     Delete
+        // </button>
     )
 }
 
