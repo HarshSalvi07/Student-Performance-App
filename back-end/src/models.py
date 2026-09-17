@@ -1,4 +1,4 @@
-from sqlalchemy import Column,String,Integer,ForeignKey,VARCHAR
+from sqlalchemy import Column,String,Integer,ForeignKey,VARCHAR,Text
 from database import Base
 
 class User(Base):
@@ -16,8 +16,9 @@ class User(Base):
 class AnalysisData(Base):
     __tablename__ = "data"
 
-    id = Column(Integer,primary_key=True)
+    id = Column(Integer, primary_key=True)
     upload = Column(String(225))
-    analysis = Column(VARCHAR(10000))
+    analysis = Column(Text)
     createdAt = Column(String(225))
-    userId = Column(Integer,ForeignKey("users.id"))
+    userId = Column(Integer, ForeignKey("users.id"))
+    status = Column(String(50), default="processing")

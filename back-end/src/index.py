@@ -4,11 +4,12 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from utils import create_token, hass_password
 from fastapi.staticfiles import StaticFiles
+from database import get_db, sessionLocal
 from main import run_automated_pipeline
 from models import User,AnalysisData
+from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
 from datetime import datetime
-from database import get_db
 import shutil
 import json
 import os
@@ -36,10 +37,10 @@ def register(user: str = Form(...), image: UploadFile = File(...),db: Session = 
 
     userExist = db.query(User).filter(User.email == user.email).first()
     if userExist :
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT,detail="User Already Exist")
+        raise HTTPException(status_code=status.HTTP_302_FOUND,detail="User Already Exist")
 
     if user.create_password != user.confirm_password:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="password not match")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,detail="password not match")
 
     file_path = os.path.join(UPLOAD_DIR, image.filename)
     contents = image.file.read()
@@ -87,13 +88,61 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(),db: Session = Depends
 
 
 
+def process_analysis(file_path: str, user_id: int, analysis_id: int):
+
+    db = sessionLocal()
+
+    try:
+
+        print("Running AI pipeline...")
+
+        feedback = run_automated_pipeline(file_path)
+
+        print("AI PIPELINE COMPLETED")
+        print("Feedback length:", len(feedback))
+
+        analysis = db.query(AnalysisData).filter(
+            AnalysisData.id == analysis_id
+        ).first()
+
+        if analysis:
+
+            print("Updating database...")
+
+            analysis.analysis = feedback
+            analysis.status = "completed"
+
+            db.commit()
+
+            print("DATABASE UPDATED SUCCESSFULLY")
+            print("Status:", analysis.status)
+
+        else:
+            print("ANALYSIS NOT FOUND:", analysis_id)
+
+    except Exception as e:
+
+        analysis = db.query(AnalysisData).filter(
+            AnalysisData.id == analysis_id
+        ).first()
+
+        if analysis:
+            analysis.status = "failed"
+            db.commit()
+
+    finally:
+        db.close()
+
+
+
 @app.post('/dashboard')
 async def dashboard(
+    background_tasks: BackgroundTasks,
     image: UploadFile = File(...),
     current_user: dict = Depends(create_token.get_current_user),
-    db: Session = Depends(get_db)):
+    db: Session = Depends(get_db)
+):
 
-    # CODE
     if not image.content_type.startswith("image/"):
         return {"error": "Only Image files are Allowed"}
 
@@ -102,22 +151,62 @@ async def dashboard(
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(image.file, buffer)
 
-    date = [datetime.now().strftime("%X"),datetime.now().strftime("%x")]
-    feedback = run_automated_pipeline(file_path)
+    date = [
+        datetime.now().strftime("%X"),
+        datetime.now().strftime("%x")
+    ]
 
+    # Create database record first
     new_data = AnalysisData(
-        upload = file_path,
-        analysis = feedback,
-        createdAt = " ".join(date),
-        userId = current_user['user_id'],
+        upload=file_path,
+        analysis="",
+        createdAt=" ".join(date),
+        userId=current_user['user_id'],
+        status="processing"
     )
 
     db.add(new_data)
     db.commit()
     db.refresh(new_data)
 
+    # Start AI processing in background
+    background_tasks.add_task(
+        process_analysis,
+        file_path,
+        current_user['user_id'],
+        new_data.id
+    )
+
     return {
-        "Feedback": feedback
+        "id": new_data.id,
+        "status": "processing",
+        "message": "Analysis started"
+    }
+
+
+
+@app.get("/analysis/{analysis_id}")
+def get_analysis(
+    analysis_id: int,
+    current_user: dict = Depends(create_token.get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    analysis = db.query(AnalysisData).filter(
+        AnalysisData.id == analysis_id,
+        AnalysisData.userId == current_user["user_id"]
+    ).first()
+
+    if not analysis:
+        raise HTTPException(
+            status_code=404,
+            detail="Analysis not found"
+        )
+
+    return {
+        "id": analysis.id,
+        "status": analysis.status,
+        "analysis": analysis.analysis
     }
 
 
@@ -177,25 +266,43 @@ def profile(current_user: dict = Depends(create_token.get_current_user),
 
 
  
-@app.put('/profile_update')
-def profile(user: str = Form(...),current_user: dict = Depends(create_token.get_current_user),
-            db: Session = Depends(get_db)):
+@app.put("/profile_update")
+async def profile(
+    user: str = Form(...),
+    image: UploadFile | None = File(None),
+    current_user: dict = Depends(create_token.get_current_user),
+    db: Session = Depends(get_db),
+):
 
-            # CODE
-            user = ProfileUpdateSchema.model_validate(json.loads(user))
-        
-            user_id = int(current_user['user_id'])
-            user_profile = db.query(User).filter(User.id == user_id).first()
+    user = ProfileUpdateSchema.model_validate(json.loads(user))
 
-            if not user_profile:
-                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="User Not found")
+    user_id = int(current_user["user_id"])
+    user_profile = db.query(User).filter(User.id == user_id).first()
 
-            new_data = user.model_dump(exclude_unset=True)
+    if not user_profile:
+        raise HTTPException(status_code=404, detail="User not found")
 
-            for key, value in new_data.items():
-                 setattr(user_profile,key,value)
+    # Update text fields
+    new_data = user.model_dump(exclude_unset=True)
+    for key, value in new_data.items():
+        setattr(user_profile, key, value)
 
-            db.commit()
-            db.refresh(user_profile)
-            
-            return {"Updated successfully"}
+    # Update image if selected
+    if image:
+        file_path = os.path.join(UPLOAD_DIR, image.filename)
+
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(image.file, buffer)
+
+        user_profile.image = file_path
+
+    db.commit()
+    db.refresh(user_profile)
+
+    return {
+        "image": user_profile.image,
+        "username": user_profile.username,
+        "age": user_profile.age,
+        "studentClass": user_profile.studentClass,
+        "description": user_profile.description,
+    }

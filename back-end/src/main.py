@@ -52,7 +52,7 @@ def run_automated_pipeline(image_path: str, subject: str):
                     "content": final_prompt
                 }
             ],
-            temperature=1.5,          # lowered from 2.0 for more consistent results
+            temperature=0.7,          # lowered from 2.0 for more consistent results
             max_tokens=1500,
             top_p=1.0,
             stream=False,
