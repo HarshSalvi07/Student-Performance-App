@@ -1,3 +1,5 @@
+# src/prompts.py
+
 ANALYSIS_PROMPT = """You are an elite academic advisor specializing in precise, targeted remediation.
 
 [TASK]

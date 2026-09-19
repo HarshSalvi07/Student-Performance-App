@@ -69,7 +69,7 @@ def run_automated_pipeline(image_path: str, subject: str):
 
 if __name__ == "__main__":
     # ---- Get inputs ----
-    target_image_file = "test_note.jpeg"
+    target_image_file = "uploads/test_note.jpeg"
 
     # Ask for subject name
     subject = input("Enter the subject name (e.g. Thermodynamics, Organic Chemistry, Calculus): ").strip()
