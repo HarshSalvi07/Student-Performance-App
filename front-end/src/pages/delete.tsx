@@ -36,7 +36,7 @@ function DeleteHistory({ id, onDelete }: Props) {
                 }
             )
             onDelete()
-            toast.success("Data Deleted Successfully")
+            toast.success("Analysis deleted successfully")
 
         } catch (error: any) {
             if (error.message?.status === 401) autoLogout(navigate)
@@ -53,10 +53,10 @@ function DeleteHistory({ id, onDelete }: Props) {
             <AlertDialogTrigger render={<Button variant="destructive">Delete</Button>} />
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Deleting Generated Notes</AlertDialogTitle>
+                    <AlertDialogTitle>Delete Generated Notes</AlertDialogTitle>
                     <AlertDialogDescription>
                         This action cannot be undone. This will permanently delete your
-                        Generated data
+                        Generated feedback
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -65,12 +65,6 @@ function DeleteHistory({ id, onDelete }: Props) {
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
-        // <button
-        //     onClick={deleteRecord}
-        //     className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-        // >
-        //     Delete
-        // </button>
     )
 }
 
