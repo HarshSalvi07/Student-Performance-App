@@ -1,17 +1,29 @@
-# --- Your Existing Stack ---
+# --- AI / LangChain ---
 langchain>=0.3.0
 langchain-openai
 langchain-groq
 langchain-community
+
+# --- App / Data ---
+fastapi
+uvicorn
 streamlit
 pandas
-chromadb
+
+# --- Database ---
+pymongo
+
+# --- Environment ---
 python-dotenv
+
+# --- Search / Documents ---
 duckduckgo-search
 pypdf
-dotenv
 
-# --- Safe Multimodal OCR Bridge Extensions ---
+# --- Vector Database ---
+chromadb
+
+# --- OCR / Image Processing ---
 opencv-python-headless
 pyclipper
 shapely
@@ -19,14 +31,11 @@ imgaug
 lmdb
 rapidfuzz
 
-# Modernized Paddle Engine Layout
+# --- PaddleOCR ---
 paddlepaddle>=2.6.1
 paddleocr>=3.0.0
 
-fastapi
-uvicorn
-sqlalchemy
-pymysql
+# --- Authentication / Security ---
 passlib[argon2]
 python-jose[cryptography]
 python-multipart

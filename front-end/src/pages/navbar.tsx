@@ -2,6 +2,7 @@ import { NavLink, Link, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import logo from "../assets/logo.png"
 import axios from "axios"
+import { toast } from "sonner"
 
 function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -37,6 +38,7 @@ function Navbar() {
     const logout = () => {
         localStorage.removeItem("access_token")
         setIsLoggedIn(false)
+        toast.success("Logged out successfully")
         navigate("/")
     }
 
