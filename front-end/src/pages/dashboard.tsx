@@ -658,10 +658,6 @@ function Dashboard() {
 
                                     ) : (
 
-                                        /* ================================== */
-                                        /* EMPTY STATE */
-                                        /* ================================== */
-
                                         <div className="flex h-full flex-col items-center justify-center text-center">
 
                                             <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-indigo-100">
