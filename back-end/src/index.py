@@ -9,17 +9,19 @@ from fastapi import (
     BackgroundTasks
 )
 from schema import RegisterSchema, ProfileSchema, ProfileUpdateSchema
+from models import users_collection, analysis_collection
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from utils import create_token, hass_password
 from fastapi.staticfiles import StaticFiles
-from main import run_automated_pipeline
-from models import users_collection, analysis_collection
+from datetime import datetime
+from main import process_file
 from database import db
 from bson import ObjectId
-from datetime import datetime
+from pathlib import Path
 import shutil
 import json
+import uuid
 import os
 
 
@@ -173,133 +175,155 @@ def process_analysis(
 
     try:
 
-        print("Running AI pipeline...")
-
-        feedback = run_automated_pipeline(
-            image_path=file_path,
-            subject=subject
+        results = process_file(
+            file_path,
+            subject
         )
 
-        print("AI PIPELINE COMPLETED")
-        print("Feedback length:", len(feedback))
+        # ----------------------------------
+        # IMAGE
+        # ----------------------------------
 
-        result = analysis_collection.update_one(
+        if Path(file_path).suffix.lower() != ".pdf":
+
+            # process_file() returns:
+            # {"filename": "feedback"}
+
+            analysis_text = next(
+                iter(results.values())
+            )
+
+        # ----------------------------------
+        # PDF
+        # ----------------------------------
+
+        else:
+
+            # Keep page separation for PDFs
+            analysis_text = "\n\n".join(
+                f"### Page {index}\n\n{result}"
+                for index, result in enumerate(
+                    results.values(),
+                    start=1
+                )
+            )
+
+        # ----------------------------------
+        # UPDATE MONGODB
+        # ----------------------------------
+
+        analysis_collection.update_one(
             {
-                "_id": ObjectId(analysis_id),
-                "userId": ObjectId(user_id)
+                "_id": ObjectId(analysis_id)
             },
             {
                 "$set": {
-                    "analysis": feedback,
+                    "analysis": analysis_text,
                     "status": "completed"
                 }
             }
         )
 
-        if result.matched_count > 0:
-
-            print("DATABASE UPDATED SUCCESSFULLY")
-            print("Status: completed")
-
-        else:
-
-            print(
-                "ANALYSIS NOT FOUND:",
-                analysis_id
-            )
+        print("✅ Analysis completed")
 
     except Exception as e:
 
         print("Analysis failed:", str(e))
 
-        try:
-
-            analysis_collection.update_one(
-                {
-                    "_id": ObjectId(analysis_id),
-                    "userId": ObjectId(user_id)
-                },
-                {
-                    "$set": {
-                        "status": "failed"
-                    }
+        analysis_collection.update_one(
+            {
+                "_id": ObjectId(analysis_id)
+            },
+            {
+                "$set": {
+                    "status": "failed",
+                    "error": str(e)
                 }
-            )
+            }
+        )
 
-        except Exception as update_error:
-
-            print(
-                "Could not update failed status:",
-                str(update_error)
-            )
+ALLOWED_EXTENSIONS = {
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".bmp",
+    ".tiff",
+    ".tif",
+    ".webp",
+    ".pdf",
+}
 
 
 
 @app.post("/dashboard")
 async def dashboard(
     background_tasks: BackgroundTasks,
-    image: UploadFile = File(...),
+    file: UploadFile = File(...),
     subject: str = Form(...),
     current_user: dict = Depends(
         create_token.get_current_user
     )
 ):
 
-    if not image.content_type.startswith("image/"):
-
-        return {
-            "error": "Only Image files are Allowed"
-        }
-
-    # Make sure subject isn't empty
     subject = subject.strip()
 
     if not subject:
-
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Subject cannot be empty"
         )
 
-    # Save uploaded image
+
+    extension = Path(file.filename).suffix.lower()
+
+    unique_filename = f"{uuid.uuid4()}{extension}"
+
+    if extension not in ALLOWED_EXTENSIONS:
+
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only PDF, JPG, JPEG, PNG, BMP, TIFF, TIF and WEBP files are allowed."
+        )
+
     file_path = os.path.join(
         UPLOAD_DIR,
-        image.filename
+        unique_filename
     )
 
     with open(file_path, "wb") as buffer:
 
         shutil.copyfileobj(
-            image.file,
+            file.file,
             buffer
         )
 
-    # Current date/time
-    created_at = datetime.now().strftime(
-        "%X %x"
-    )
 
-    # MongoDB user ID
+    created_at = datetime.now().strftime("%X %x")
+
     user_id = current_user["user_id"]
 
-    # Create analysis document
+
+    # ----------------------------------
+    # MONGODB DOCUMENT
+    # ----------------------------------
+
     new_data = {
         "upload": file_path,
         "analysis": "",
         "createdAt": created_at,
         "userId": ObjectId(user_id),
         "subject": subject,
-        "status": "processing"
+        "status": "processing",
     }
 
-    # Insert analysis into MongoDB
+
     result = analysis_collection.insert_one(
         new_data
     )
 
     analysis_id = result.inserted_id
 
-    # Start AI processing
+
     background_tasks.add_task(
         process_analysis,
         file_path,
@@ -307,6 +331,7 @@ async def dashboard(
         str(analysis_id),
         subject
     )
+
 
     return {
         "id": str(analysis_id),

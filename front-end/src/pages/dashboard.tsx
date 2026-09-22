@@ -223,7 +223,7 @@ function Dashboard() {
 
             const formData = new FormData()
 
-            formData.append("image", image)
+            formData.append("file", image)
             formData.append("subject", subject.trim())
 
 
@@ -447,17 +447,39 @@ function Dashboard() {
                             {/* IMAGE UPLOAD */}
 
                             <label
-                                htmlFor="testImage"
+                                htmlFor="testFile"
                                 className="group flex h-72 cursor-pointer items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 transition hover:border-indigo-400"
                             >
 
                                 {image ? (
 
-                                    <img
-                                        src={URL.createObjectURL(image)}
-                                        alt="Preview"
-                                        className="h-full w-full rounded-2xl object-contain p-3"
-                                    />
+                                    image.type === "application/pdf" ? (
+
+                                        <div className="flex flex-col items-center justify-center text-center">
+
+                                            <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-red-100 text-4xl">
+                                                📄
+                                            </div>
+
+                                            <p className="mt-4 max-w-55 truncate font-semibold text-slate-700">
+                                                {image.name}
+                                            </p>
+
+                                            <p className="mt-1 text-sm text-slate-500">
+                                                PDF document selected
+                                            </p>
+
+                                        </div>
+
+                                    ) : (
+
+                                        <img
+                                            src={URL.createObjectURL(image)}
+                                            alt="Preview"
+                                            className="h-full w-full rounded-2xl object-contain p-3"
+                                        />
+
+                                    )
 
                                 ) : (
 
@@ -486,17 +508,15 @@ function Dashboard() {
 
 
                                         <h3 className="font-semibold text-slate-700">
-                                            Select Test Image
+                                            Select Test Paper
                                         </h3>
 
-
                                         <p className="mt-2 text-sm text-slate-500">
-                                            Click to upload your answer sheet
+                                            Upload your handwritten or printed answer sheet
                                         </p>
 
-
                                         <p className="mt-3 text-xs text-slate-400">
-                                            PNG • JPG • JPEG
+                                            PDF • PNG • JPG • JPEG
                                         </p>
 
                                     </div>
@@ -504,26 +524,21 @@ function Dashboard() {
 
 
                                 <input
-                                    id="testImage"
+                                    id="testFile"
                                     type="file"
-                                    accept="image/*"
+                                    accept="image/*,.pdf"
                                     className="hidden"
                                     disabled={loading}
                                     onChange={(e) => {
 
-                                        const file =
-                                            e.target.files?.[0]
+                                        const file = e.target.files?.[0]
 
                                         if (file) {
-
                                             setImage(file)
-
                                             setFetchData(null)
+                                            setError("")
                                         }
-                                        else {
-                                            toast.error("Unable to upload profile image")
-                                            return
-                                        }
+
                                     }}
                                 />
 
