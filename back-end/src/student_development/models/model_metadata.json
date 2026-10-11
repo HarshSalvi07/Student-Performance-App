@@ -1,0 +1,51 @@
+{
+  "labels": [
+    "Needs Improvement",
+    "Developing",
+    "Proficient",
+    "Advanced"
+  ],
+  "feature_names": [
+    "answer_word_count",
+    "answer_unique_word_ratio",
+    "sentence_count",
+    "explanation_marker_count",
+    "subject_term_count",
+    "average_word_length",
+    "subject_knowledge_score",
+    "positive_advisor_terms",
+    "improvement_advisor_terms",
+    "advisor_report_word_count"
+  ],
+  "feature_mean": [
+    0.03395996242761612,
+    0.8246217370033264,
+    0.0636289194226265,
+    0.04035722091794014,
+    0.04872865229845047,
+    0.3508606553077698,
+    0.6006445288658142,
+    0.03785702958703041,
+    0.025785697624087334,
+    0.042425788938999176
+  ],
+  "feature_std": [
+    0.012883596122264862,
+    0.07514746487140656,
+    0.016141526401042938,
+    0.029374664649367332,
+    0.019812263548374176,
+    0.034655991941690445,
+    0.22925804555416107,
+    0.04886987432837486,
+    0.050100985914468765,
+    0.0038539671804755926
+  ],
+  "input_size": 10,
+  "hidden_sizes": [
+    32,
+    16
+  ],
+  "seed": 42,
+  "dataset_type": "synthetic"
+}

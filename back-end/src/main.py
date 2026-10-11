@@ -4,7 +4,7 @@ import tempfile
 from pathlib import Path
 from groq import Groq
 from dotenv import load_dotenv
-
+from subject_knowledge_report import generate_subject_knowledge_report
 
 load_dotenv()
 
@@ -69,10 +69,48 @@ def run_automated_pipeline(image_path: str, subject: str):
             stream=False,
         )
 
-        print("\n=== ✨ SUBJECT-FOCUSED ADVISOR OUTPUT ===")
         result = response.choices[0].message.content
+        print("\n=== ✨ ANSWERING-STYLE ADVISOR OUTPUT ===")
+        print("📊 Step 4: Calculating subject-knowledge score...")
+
+        try:
+            scoring_output = generate_subject_knowledge_report(
+                ocr_text=extracted_text,
+                subject=subject
+            )
+
+            result = result + scoring_output
+
+       
+        except Exception as scoring_error:
+            print(f"⚠️ Subject scoring failed: {scoring_error}")
+
+        # Step 5: Classify overall student development
+        print("🧠 Step 5: Classifying student development...")
+
+        try:
+            from student_development.predict_development import (
+                generate_development_report
+            )
+
+            development_output = generate_development_report(
+                ocr_text=extracted_text,
+                advisor_report=result,
+                subject=subject,
+            )
+
+            result += "\n\n" + development_output
+            print("✅ Student development report generated!")
+
+        except Exception as development_error:
+            print(
+                f"⚠️ Student development classification failed: "
+                f"{development_error}"
+            )
+
         print(result)
         return result
+
 
     except Exception as e:
         print(f"❌ LLM Error: {str(e)}")
