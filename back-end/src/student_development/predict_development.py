@@ -141,15 +141,4 @@ def generate_development_report(ocr_text: str, advisor_report: str,
 
 ## Model Class Scores
 {probabilities}
-
-## Potential Strengths
-{strengths}
-
-## Areas for Improvement
-{improvements}
-
-## Important Limitations
-{limitations}
-
-> **Prototype warning:** This classifier was trained on synthetic data. Its predicted level and class scores are not validated measures of student performance.
 """

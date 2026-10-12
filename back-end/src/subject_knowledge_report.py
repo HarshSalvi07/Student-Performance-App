@@ -45,20 +45,6 @@ def generate_subject_knowledge_report(ocr_text: str, subject: str) -> str:
 ## Topic Ratings
 
 {topics_output}
-
-## Recommendations
-
-{recommendations_output}
-
-## Assessment Summary
-
-{scoring_result.get('overall_summary', 'No summary available.')}
-
-## Limitations
-
-{limitations_output}
-
-> **Note:** This is a rule-based heuristic estimate, not verified factual grading or an official exam mark.
 """
 
     return report
