@@ -3,6 +3,11 @@ import { useEffect, useState } from "react"
 import ProfileUpdate from "./profile_updated"
 import { autoLogout } from "../lib/utils"
 import { useNavigate } from "react-router-dom"
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+} from "../components/ui/alert"
 
 function Profile() {
     const [image, setImage] = useState("")
@@ -16,6 +21,8 @@ function Profile() {
     const [showUpdate, setShowUpdate] = useState(false)
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
+    const [error, setError] = useState("")
+
 
     useEffect(() => {
         const getProfile = async () => {
@@ -50,11 +57,12 @@ function Profile() {
                 setTotalAnalyses(historyRes.data.length)
 
             } catch (error: any) {
-                console.log("STATUS:", error.response?.status)
-                console.log("DETAIL:", error.response?.data?.detail)
                 if (error.message?.status === 401) {
                     autoLogout(navigate)
                 }
+                setError(
+                    "Your Profile couldn't load, try again later"
+                )
             } finally {
                 setLoading(false)
             }
@@ -124,7 +132,25 @@ function Profile() {
 
                         {/* Profile Image */}
                         <div className="shrink-0">
-                            {image ? (
+                            {error ? (
+                                <div className="flex min-h-130 items-center justify-center px-4">
+
+                                    <Alert
+                                        variant="destructive"
+                                        className="max-w-xl"
+                                    >
+                                        <AlertTitle>
+                                            Unable to Load Profile
+                                        </AlertTitle>
+
+                                        <AlertDescription>
+                                            {error}
+                                        </AlertDescription>
+                                    </Alert>
+
+                                </div>
+
+                            ) : image ? (
                                 <img
                                     src={`http://127.0.0.1:8000/${image}?t=${Date.now()}`}
                                     alt="Profile"
@@ -309,7 +335,7 @@ function Profile() {
                         <img
                             src={`http://127.0.0.1:8000/${image}`}
                             alt="Profile Preview"
-                            className="max-h-[80vh] max-w-[80vw] rounded-4xl border-8 border-white shadow-2xl"/>
+                            className="max-h-[80vh] max-w-[80vw] rounded-4xl border-8 border-white shadow-2xl" />
 
                         <button
                             onClick={() => setPreview(false)}

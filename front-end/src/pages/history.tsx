@@ -4,6 +4,11 @@ import ReactMarkdown from "react-markdown"
 import DeleteHistory from "./delete"
 import { useNavigate } from "react-router-dom"
 import { autoLogout } from "../lib/utils"
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+} from "../components/ui/alert"
 
 type HistoryItem = {
     id: number
@@ -17,11 +22,13 @@ function History() {
     const navigate = useNavigate()
     const [history, setHistory] = useState<HistoryItem[]>([])
     const [selected, setSelected] = useState<HistoryItem | null>(null)
+    const [error, setError] = useState("")
 
     useEffect(() => {
         const getData = async () => {
             try {
                 setLoading(true)
+                setError("")
 
                 const token = localStorage.getItem("access_token")
 
@@ -37,11 +44,16 @@ function History() {
                 setHistory(res.data)
 
             } catch (error: any) {
-                if (error.message?.status === 401) {
+
+                if (error.response?.status === 401) {
                     autoLogout(navigate)
                     return
                 }
-                console.log(error)
+
+                setError(
+                    "Your previous analyses couldn't be loaded. Please refresh and try again."
+                )
+
             } finally {
                 setLoading(false)
             }
@@ -128,7 +140,25 @@ function History() {
                 </div>
 
                 {/* Empty State / History */}
-                {history.length === 0 ? (
+                {error ? (
+                    <div className="flex min-h-130 items-center justify-center px-4">
+
+                        <Alert
+                            variant="destructive"
+                            className="max-w-xl"
+                        >
+                            <AlertTitle>
+                                Unable to Load History
+                            </AlertTitle>
+
+                            <AlertDescription>
+                                {error}
+                            </AlertDescription>
+                        </Alert>
+
+                    </div>
+
+                ) : history.length === 0 ? (
                     <div className="rounded-3xl border border-slate-200 bg-white/80 backdrop-blur-xl p-12 text-center shadow-lg">
                         <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-indigo-100">
                             <span className="text-4xl">📄</span>
@@ -227,7 +257,7 @@ function History() {
 
                             <button
                                 onClick={() => setSelected(null)}
-                                className="h-10 w-10 rounded-full hover:bg-slate-100 text-slate-500 text-xl"
+                                className="h-10 w-10 rounded-full hover:bg-slate-300 text-slate-500 text-xl"
                             >
                                 ✕
                             </button>

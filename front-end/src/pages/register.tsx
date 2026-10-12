@@ -42,7 +42,7 @@ function Register() {
                 form_data
             )
 
-            toast.success(`Register new user: ${username} Successfully`)
+            toast.success(`Register new user Successfully`)
             navigate("/login")
         }
         catch (error: any) {

@@ -1,0 +1,70 @@
+{
+  "dataset_type": "synthetic",
+  "test_accuracy": 1.0,
+  "classification_report": {
+    "Needs Improvement": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 38.0
+    },
+    "Developing": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 37.0
+    },
+    "Proficient": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 38.0
+    },
+    "Advanced": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 37.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 150.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 150.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      38,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      37,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      38,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      37
+    ]
+  ],
+  "warning": "These metrics only measure performance on generated synthetic examples. They do not establish real-world validity."
+}

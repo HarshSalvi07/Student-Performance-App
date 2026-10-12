@@ -1,3 +1,6 @@
+import problem from "../assets/problem.png"
+import solution from "../assets/solution.png"
+
 function About() {
     return (
         <div className="min-h-screen bg-[#F6F8FC] overflow-hidden">
@@ -6,7 +9,7 @@ function About() {
             {/* INTRODUCTION */}
             {/* ========================================================= */}
             <section className="min-h-screen flex flex-col items-center">
-                <div className="text-[4.5rem] uppercase flex justify-center mt-4 bg-linear-to-r from-fuchsia-700 via-violet-400 to-indigo-500 bg-clip-text text-transparent">
+                <div className="text-[4.5rem] font-semibold uppercase flex justify-center mt-4 bg-linear-to-r from-fuchsia-700 via-violet-400 to-indigo-500 bg-clip-text text-transparent">
                     ABOUT THE SYSTEM</div>
                 <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-16 sm:py-20">
 
@@ -81,7 +84,7 @@ function About() {
                                         </div>
                                     </div>
 
-                                    <div className="ml-5 h-5 border-l-2 border-dashed border-indigo-300"></div>
+                                    <div className="ml-5 h-5 justify-self-center border-l-2 border-dashed border-indigo-300"></div>
 
                                     <div className="flex items-center gap-4 rounded-2xl bg-indigo-50 border border-indigo-100 p-4">
                                         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-xl text-white">
@@ -99,7 +102,7 @@ function About() {
                                         </div>
                                     </div>
 
-                                    <div className="ml-5 h-5 border-l-2 border-dashed border-violet-300"></div>
+                                    <div className="ml-5 h-5 justify-self-center border-l-2 border-dashed border-violet-300"></div>
 
                                     <div className="flex items-center gap-4 rounded-2xl bg-violet-50 border border-violet-100 p-4">
                                         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-600 text-xl text-white">
@@ -117,7 +120,7 @@ function About() {
                                         </div>
                                     </div>
 
-                                    <div className="ml-5 h-5 border-l-2 border-dashed border-emerald-300"></div>
+                                    <div className="ml-5 h-5 justify-self-center border-l-2 border-dashed border-emerald-300"></div>
 
                                     <div className="flex items-center gap-4 rounded-2xl bg-emerald-50 border border-emerald-100 p-4">
                                         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-xl text-white">
@@ -147,10 +150,12 @@ function About() {
             {/* ========================================================= */}
             {/* PROBLEM */}
             {/* ========================================================= */}
-            <section className="min-h-screen flex flex-col items-center bg-slate-100/60">
-                <div className="text-[4.5rem] uppercase flex justify-center mt-4 bg-linear-to-r from-violet-400 via-fuchsia-700 to-indigo-500 bg-clip-text text-transparent">
-                    THE PROBLEM</div>
-                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-16 sm:py-20">
+            <section className="min-h-screen flex flex-col i bg-slate-100/60 mx-auto w-full max-w-7xl py-6 sm:py-10">
+                <div className="text-[4.5rem] px-4 sm:px-6 flex gap-2 items-center mt-4 bg-linear-to-r from-violet-400 via-fuchsia-700 to-indigo-500 bg-clip-text text-transparent">
+                    <span>THE PROBLEM</span>
+                    <img className="h-30 w-30" src={problem} alt="" />
+                </div>
+                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-6 sm:py-10">
 
                     <div className="max-w-3xl">
 
@@ -220,9 +225,10 @@ function About() {
             {/* ========================================================= */}
             {/* SOLUTION */}
             {/* ========================================================= */}
-            <section className="min-h-screen flex flex-col items-center">
-                <div className="text-[4.5rem] uppercase flex justify-center mt-4 bg-linear-to-r from-violet-400 via-fuchsia-700 to-indigo-500 bg-clip-text text-transparent">
-                    THE SOLUTION
+            <section className="min-h-screen flex flex-col bg-slate-100/60 mx-auto w-full max-w-7xl py-6 sm:py-10">
+                <div className="text-[4.5rem] px-4 sm:px-11 uppercase flex gap-5 items-center justify-end mt-4 bg-linear-to-r from-violet-400 via-fuchsia-700 to-indigo-500 bg-clip-text text-transparent">
+                    <img className="h-30 w-30" src={solution} alt="" />
+                    <span>THE SOLUTION</span>
                 </div>
                 <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-16 sm:py-20">
 
@@ -376,14 +382,14 @@ function About() {
             {/* ========================================================= */}
             {/* WHAT THE STUDENT RECEIVES */}
             {/* ========================================================= */}
-            <section className="min-h-screen flex items-center">
-                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-16 sm:py-20">
+            <section className="min-h-screen flex flex-col items-center bg-slate-100/60 mx-auto w-full max-w-7xl py-6 sm:py-10">
+                <div className="text-[4.5rem] px-4 sm:px-11 uppercase flex gap-5 items-center justify-end mt-4 bg-linear-to-r from-violet-400 via-fuchsia-700 to-indigo-500 bg-clip-text text-transparent">
+                    THE RESULT
+                </div>
+                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-6 sm:py-10">
 
                     <div className="text-center max-w-3xl mx-auto">
 
-                        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-indigo-600">
-                            THE RESULT
-                        </p>
 
                         <h2 className="mt-4 text-3xl sm:text-4xl font-bold text-slate-900">
                             What Students Receive
@@ -396,14 +402,12 @@ function About() {
 
                     </div>
 
-                    <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div className="mt-12 grid sm:grid-cols-1 lg:grid-cols-2 gap-10">
 
                         <div className="rounded-3xl bg-white border border-slate-200 p-6 shadow-sm">
-                            <div className="text-3xl mb-4">💪</div>
-
-                            <h3 className="font-bold text-slate-800">
+                            <div className="flex gap-3 text-3xl mb-4">💪<h3 className="font-bold text-slate-800">
                                 Strengths
-                            </h3>
+                            </h3></div>
 
                             <p className="mt-3 text-sm leading-6 text-slate-500">
                                 Understand which concepts and areas you are performing well in.
@@ -411,11 +415,11 @@ function About() {
                         </div>
 
                         <div className="rounded-3xl bg-white border border-slate-200 p-6 shadow-sm">
-                            <div className="text-3xl mb-4">🔎</div>
-
-                            <h3 className="font-bold text-slate-800">
+                            <div className="flex gap-3 text-3xl mb-4">🔎<h3 className="font-bold text-slate-800">
                                 Mistakes
-                            </h3>
+                            </h3></div>
+
+
 
                             <p className="mt-3 text-sm leading-6 text-slate-500">
                                 Identify incorrect answers and possible reasons behind them.
@@ -423,11 +427,11 @@ function About() {
                         </div>
 
                         <div className="rounded-3xl bg-white border border-slate-200 p-6 shadow-sm">
-                            <div className="text-3xl mb-4">🧠</div>
-
-                            <h3 className="font-bold text-slate-800">
+                            <div className="flex gap-3 text-3xl mb-4">🧠<h3 className="font-bold text-slate-800">
                                 Concept Gaps
-                            </h3>
+                            </h3></div>
+
+
 
                             <p className="mt-3 text-sm leading-6 text-slate-500">
                                 Find topics where deeper understanding or revision may be needed.
@@ -435,11 +439,11 @@ function About() {
                         </div>
 
                         <div className="rounded-3xl bg-white border border-slate-200 p-6 shadow-sm">
-                            <div className="text-3xl mb-4">🚀</div>
-
-                            <h3 className="font-bold text-slate-800">
+                            <div className="flex gap-3 text-3xl mb-4">🚀<h3 className="font-bold text-slate-800">
                                 Next Steps
-                            </h3>
+                            </h3></div>
+
+                            
 
                             <p className="mt-3 text-sm leading-6 text-slate-500">
                                 Get practical suggestions for improving future performance.
@@ -456,7 +460,7 @@ function About() {
             {/* TECHNOLOGY */}
             {/* ========================================================= */}
             <section className="min-h-screen flex items-center">
-                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-16 sm:py-20">
+                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-6 sm:py-10">
 
                     <div className="rounded-[2rem] bg-linear-to-br from-indigo-600 via-violet-600 to-indigo-700 p-7 sm:p-10 lg:p-14 text-white shadow-2xl">
 
@@ -500,7 +504,7 @@ function About() {
 
                                 <div className="rounded-2xl bg-white/10 border border-white/10 p-5 text-center backdrop-blur-sm">
                                     <p className="text-2xl mb-2">🗄️</p>
-                                    <p className="font-semibold">MySQL</p>
+                                    <p className="font-semibold">MogngoDB</p>
                                 </div>
 
                                 <div className="rounded-2xl bg-white/10 border border-white/10 p-5 text-center backdrop-blur-sm">
