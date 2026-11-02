@@ -302,11 +302,6 @@ async def dashboard(
 
     user_id = current_user["user_id"]
 
-
-    # ----------------------------------
-    # MONGODB DOCUMENT
-    # ----------------------------------
-
     new_data = {
         "upload": file_path,
         "analysis": "",
@@ -323,7 +318,6 @@ async def dashboard(
 
     analysis_id = result.inserted_id
 
-
     background_tasks.add_task(
         process_analysis,
         file_path,
@@ -332,16 +326,11 @@ async def dashboard(
         subject
     )
 
-
     return {
         "id": str(analysis_id),
         "status": "processing",
         "message": "Analysis started"
     }
-
-# =========================================================
-# GET ANALYSIS
-# =========================================================
 
 @app.get("/analysis/{analysis_id}")
 def get_analysis(

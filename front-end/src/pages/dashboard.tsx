@@ -12,7 +12,7 @@ import {
 import { AlertCircleIcon } from "lucide-react"
 
 type FeedbackResponse = {
-    Feedback: string
+    analysis: string
 }
 
 type AnalysisResponse = {
@@ -100,7 +100,7 @@ function Dashboard() {
                 setTimeout(() => {
 
                     setFetchData({
-                        Feedback: res.data.analysis
+                        analysis: res.data.analysis
                     })
 
                     setShowCompleted(false)
@@ -136,6 +136,8 @@ function Dashboard() {
                 localStorage.removeItem(
                     "active_analysis_id"
                 )
+
+                setError("Analysis failed. Please upload another file and try again.")
 
                 toast.error(
                     "Analysis failed. Please try again."
@@ -516,7 +518,7 @@ function Dashboard() {
                                         </p>
 
                                         <p className="mt-3 text-xs text-slate-400">
-                                            PDF • PNG • JPG • JPEG
+                                            PDF • JPG • JPEG • PNG • BMP • TIFF • WEBP
                                         </p>
 
                                     </div>
@@ -526,7 +528,7 @@ function Dashboard() {
                                 <input
                                     id="testFile"
                                     type="file"
-                                    accept="image/*,.pdf"
+                                    accept=".pdf,.jpg,.jpeg,.png,.bmp,.tiff,.tif,.webp"
                                     className="hidden"
                                     disabled={loading}
                                     onChange={(e) => {
@@ -652,7 +654,7 @@ function Dashboard() {
                 "
                                         >
                                             <ReactMarkdown>
-                                                {fetchData.Feedback}
+                                                {fetchData.analysis}
                                             </ReactMarkdown>
                                         </div>
 
